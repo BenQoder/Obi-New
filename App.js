@@ -88,8 +88,6 @@ export default function Page() {
     );
 
     setIsLoading(false);
-    const jsonx = await response.json();
-    console.log(jsonx);
 
     if (response.status !== 200) {
       return;
