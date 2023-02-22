@@ -94,7 +94,6 @@ export default function Page() {
     }
 
     const json = await response.json();
-    console.log(json);
 
     setContact(json.data[0] ?? null);
   };

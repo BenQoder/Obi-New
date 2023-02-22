@@ -8,6 +8,8 @@ SETOF "PHONENUMBERS" LANGUAGE SQL AS
 	        SELECT id
 	        FROM "phoneNumbers"
 	        ORDER BY RANDOM()
-	        LIMIT 1
-	    ) RETURNING *;
+	        LIMIT
+	            1
+	    )
+	    AND messaged_on = NULL RETURNING *;
 	$$;
