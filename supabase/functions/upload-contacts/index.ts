@@ -31,9 +31,12 @@ serve(async (req) => {
 
     const { error } = await supabaseClient
       .from('phoneNumbers')
-      .insert(contacts.map((contact) => ({
+      .upsert(contacts.map((contact) => ({
         number: contact,
-      })))
+      })), {
+        ignoreDuplicates: true,
+        onConflict: 'number',
+      })
 
     if (error) console.error(error)
 

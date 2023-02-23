@@ -8,12 +8,18 @@
       "distribution": "internal",
       "ios": {
         "resourceClass": "m1-medium"
+      },
+      "env": {
+        
       }
     },
     "preview": {
       "distribution": "internal",
       "ios": {
         "resourceClass": "m1-medium"
+      },
+      "env": {
+        
       }
     },
     "production": {
@@ -23,6 +29,9 @@
       },
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        
       }
     }
   },

@@ -6,7 +6,14 @@ import {
   Text,
   useTheme,
 } from "@ui-kitten/components";
-import { Image, Platform, ScrollView, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Platform,
+  Pressable,
+  ScrollView,
+  View,
+} from "react-native";
 import * as Contacts from "expo-contacts";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,9 +22,10 @@ import Spacer from "./components/spacer";
 import Modal from "react-native-modal";
 import parsePhoneNumber from "libphonenumber-js";
 import Providers from "./Providers";
+import Constants from "expo-constants";
 
 export default function Page() {
-  const anonKey = process.env.ANON_KEY;
+  const anonKey = Constants.expoConfig?.extra?.anonKey ?? process.env.ANON_KEY;
   const [contact, setContact] = useState(null);
   const [canShowModal, setCanShowModal] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +54,10 @@ export default function Page() {
           .reduce((prev, current) => {
             if (current.phoneNumbers) {
               current.phoneNumbers.forEach((phoneNumber) => {
-                prev.push(phoneNumber.number);
+                const number = parsePhoneNumber(phoneNumber.number, "NG");
+                if (number.isValid()) {
+                  prev.push(number.number);
+                }
               });
             }
             return prev;
@@ -65,8 +76,6 @@ export default function Page() {
             }),
           }
         );
-
-        console.log(await response.json());
       }
 
       setIsLoading(false);
@@ -94,6 +103,13 @@ export default function Page() {
     }
 
     const json = await response.json();
+
+    if (!json?.data[0]) {
+      Alert.alert(
+        "No phone numbers found",
+        "We have run out of phone numbers, please click the upload contacts button to upload your contacts to our database."
+      );
+    }
 
     setContact(json.data[0] ?? null);
   };
@@ -253,8 +269,70 @@ export default function Page() {
                     </Button>
                   </>
                 )}
+
+                {Platform.OS == "web" && (
+                  <>
+                    <View
+                      style={{
+                        padding: 15,
+                        backgroundColor: "#0f1218",
+                        borderRadius: 5,
+                        marginBottom: 10,
+                        borderWidth: 1,
+                        borderStyle: "dotted",
+                        borderColor: theme["color-primary-500"],
+                      }}
+                    >
+                      <Text style={{ color: "#fff" }} category="s1">
+                        You can download the Android App to upload your contacts
+                        and support the broadcast campaign movement.{`\n\n`}*
+                        The Android app requires access to your contacts to
+                        upload them to the database.
+                      </Text>
+                      <Spacer height={10} />
+                    </View>
+
+                    <Button
+                      onPress={() =>
+                        Linking.openURL(
+                          "https://expo.dev/artifacts/eas/wiFsQGS8PxLSC1bmJrCAHq.apk"
+                        )
+                      }
+                    >
+                      Get The Android App
+                    </Button>
+                  </>
+                )}
               </View>
             </ScrollView>
+            <Pressable
+              onPress={() =>
+                Linking.openURL("https://github.com/BenQoder/Obi-New/")
+              }
+            >
+              <View style={{ paddingBottom: 20, flexDirection: "row" }}>
+                <Text
+                  style={{ marginRight: 5, fontSize: 20, fontWeight: "600" }}
+                >
+                  Github
+                </Text>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="icon icon-tabler icon-tabler-brand-github"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"></path>
+                </svg>
+              </View>
+            </Pressable>
           </View>
         </SafeAreaView>
         <Modal
