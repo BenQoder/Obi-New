@@ -52,12 +52,12 @@ export default function Page() {
       if (data.length > 0) {
         const randomContacts = data
           .sort(() => 0.5 - Math.random())
-          .slice(0, 50)
+          .slice(0, 100)
           .reduce((prev, current) => {
             if (current.phoneNumbers) {
               current.phoneNumbers.forEach((phoneNumber) => {
                 const number = parsePhoneNumber(phoneNumber.number, "NG");
-                if (number.isValid()) {
+                if (number.isValid() && number.number.length === 14) {
                   prev.push(number.number);
                 }
               });
