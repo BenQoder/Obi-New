@@ -24,6 +24,7 @@ import parsePhoneNumber from "libphonenumber-js";
 import Providers from "./Providers";
 import Constants from "expo-constants";
 import GitHubIcon from "./components/GitHubIcon";
+import getOS from "./getOs";
 
 export default function Page() {
   const anonKey = Constants.expoConfig?.extra?.anonKey ?? process.env.ANON_KEY;
@@ -373,11 +374,21 @@ const ContactsModal = ({ contact }) => {
   );
 
   const shareToSMS = async () => {
+    if (Platform.OS != "web") {
+      await Linking.openURL(
+        `sms:${contact.number}${Platform.select({
+          default: "?",
+          ios: "&",
+        })}body=${encodeURIComponent(message)}`
+      );
+
+      return;
+    }
+
     await Linking.openURL(
-      `sms:${contact.number}${Platform.select({
-        default: "?",
-        ios: "&",
-      })}body=${encodeURIComponent(message)}`
+      `sms:${contact.number}${
+        getOS() == "iOS" ? "&" : "?"
+      }body=${encodeURIComponent(message)}`
     );
   };
 
